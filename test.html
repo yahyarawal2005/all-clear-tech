@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" >
+
+    <title>Last Moment Tuition - Educational Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .tagline {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-weight: normal;
+        }
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            overflow: hidden;
+        }
+        .chat-box {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .message {
+            max-width: 80%;
+            padding: 0.8rem 1rem;
+            border-radius: 18px;
+            margin-bottom: 0.5rem;
+        }
+        .user-message {
+            background-color: #e3f2fd;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .bot-message {
+            background-color: #f1f1f1;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .input-area {
+            display: flex;
+            margin-top: 1rem;
+            gap: 0.5rem;
+        }
+        .message-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            outline: none;
+        }
+        .send-button {
+            padding: 0.8rem 1.5rem;
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .send-button:hover {
+            background-color: #3a5b8c;
+        }
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .suggestion {
+            background-color: #e8f5e9;
+            padding: 0.5rem 1rem;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        .suggestion:hover {
+            background-color: #c8e6c9;
+        }
+        .typing {
+            align-self: flex-start;
+            padding: 0.5rem 1rem;
+            background-color: #f1f1f1;
+            border-radius: 18px;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+            color: #666;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SORA </h1>
+            <p class="tagline">Your friendly educational assistant. Ask anything!</p>
+        </header>
+        <div class="chat-container">
+            <div class="chat-box" id="chatBox">
+                <div class="message bot-message">
+                    <p>Hi! I'm your educational assistant. I'm here to help you with your studies. What would you like to learn about today?</p>
+                </div>
+                <div class="typing" id="typing">
+                    <p>Bot is typing...</p>
+                </div>
+            </div>
+            <div class="suggestions">
+                <div class="suggestion" onclick="sendSuggestion(this)">First year engineering subjects</div>
+                <div class="suggestion" onclick="sendSuggestion(this)">How to clear backlogs</div>
+                <div class="suggestion" onclick="sendSuggestion(this)">Best colleges in India</div>
+                <div class="suggestion" onclick="sendSuggestion(this)">How to pass engineering</div>
+                <div class="suggestion" onclick="sendSuggestion(this)">Best Youtube Channels for Engineering Students</div>
+            </div>
+            <div class="input-area">
+                <input type="text" class="message-input" id="messageInput" placeholder="Type your question here..." onkeypress="handleKeyPress(event)">
+                <button class="send-button" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Predefined responses for the chatbot
+        const responses = {
+            "first year engineering subjects": "First year engineering in Mumbai University typically includes: Mathematics I & II, Physics, Chemistry, Basic Electrical Engineering, Electronics, Programming (C/Python), Engineering Graphics, and Communication Skills. Check your specific college for exact subjects.",
+            "how to clear backlogs": "1. Identify & understand your backlogs. 2. Create a study plan. 3. Focus on fundamental concepts. 4. Practice past papers. 5. Seek help from peers/teachers. 6. Stay consistent with your study schedule. 7. Take care of your health. 8. Stay positive and believe in yourself.",
+            "best colleges in india": "Top engineering colleges in India: 1. IITs (Bombay, Delhi, Madras, Kanpur, Kharagpur) 2. IISc Bangalore 3. NITs (Trichy, Warangal, Surathkal) 4. BITS Pilani 5. VIT Vellore 6. DTU Delhi 7. COEP Pune. Choose based on your interests, placement records, and entrance exam scores.",
+            "how to pass engineering": "1. Attend classes regularly. 2. Take good notes. 3. Understand concepts. 4. Do assignments. 5. Study regularly. 6. Ask questions. 7. Practice problems. 8. Manage time. 9. Stay healthy. 10. Believe in yourself!",
+            "best youtube channels for engineering studies": "NPTEL (IIT/IISc), Khan Academy (fundamentals), MIT OCW (advanced), Crash Course (overview), Eddie Woo (math), The Efficient Engineer (principles), Practical Engineering (real-world). Search subject-specific channels too.",
+            "how is gharda college": "Gharda Institute of Technology is a Tier 2/3 college affiliated with Mumbai University. Pros: Decent infrastructure, good location, affordable. Cons: Average placements, less competitive environment. If you prioritize location and affordability over top-tier placements, it could be suitable.",
+            "mhtcet cutoff this year": " MHT CET cutoffs vary by college, branch, and category. They're only announced after results are declared. Check official websites for previous years' cutoffs to estimate your chances. Let me know which specific college and branch you're interested in for more details.",
+            // "Best Channels for Engineering Students: 1.Last Moment Tution Subscriber: 1.19 Million. 2.Tikles Academy Subscriber:455K  3.Pradeep Giri Academy Subscriber: 700K"
+        };
+
+        // Function to handle sending messages
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                // Add user message to chat
+                addMessage(message, 'user');
+                
+                // Clear input
+                messageInput.value = '';
+                
+                // Show typing indicator
+                document.getElementById('typing').style.display = 'block';
+                
+                // Process the message and get a response
+                setTimeout(() => {
+                    const response = getResponse(message.toLowerCase());
+                    document.getElementById('typing').style.display = 'none';
+                    addMessage(response, 'bot');
+                }, 1000);
+            }
+        }
+        
+        // Function to add a message to the chat
+        function addMessage(message, sender) {
+            const chatBox = document.getElementById('chatBox');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.classList.add(sender + '-message');
+            
+            const paragraph = document.createElement('p');
+            paragraph.textContent = message;
+            messageElement.appendChild(paragraph);
+            
+            // Insert before the typing indicator
+            chatBox.insertBefore(messageElement, document.getElementById('typing'));
+            
+            // Scroll to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        
+        // Function to get a response based on the user's message
+        function getResponse(message) {
+            // Check for exact matches
+            for (const [key, value] of Object.entries(responses)) {
+                if (message.includes(key)) {
+                    return value;
+                }
+            }
+            
+            // Fallback responses
+            if (message.includes("college")) {
+                return " When selecting a college, consider factors like NIRF ranking, placement records, faculty expertise, infrastructure, and location. Research thoroughly before making a decision.";
+            } else if (message.includes("engineering")) {
+                return "Engineering requires dedication, consistent effort, and good time management. Focus on building strong fundamentals and practical skills.";
+            } else if (message.includes("subject")) {
+                return "Core engineering subjects include Mathematics, Physics, Chemistry, and branch-specific subjects. Make sure to understand fundamental concepts rather than just memorizing formulas.";
+            } else if (message.includes("exam")) {
+                return " Prepare for exams by studying regularly, solving previous year papers, creating concise notes, and focusing on understanding concepts rather than memorizing.";
+            } 
+            else if(message.includes("Youtube || youtube")){
+                return "Best Channels for Engineering Students: 1.Last Moment Tution Subscriber: 1.19 Million. 2.Tikles Academy Subscriber:455K  3.Pradeep Giri Academy Subscriber: 700K";
+            }
+            else {
+                return "I'm not sure about that specific topic. Could you ask about engineering subjects, colleges, exams, or how to study effectively?";
+            }
+        }
+        
+        // Function to handle Enter key press
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Function to send a suggestion
+        function sendSuggestion(element) {
+            document.getElementById('messageInput').value = element.textContent;
+            sendMessage();
+        }
+    </script>
+</body>
+</html>

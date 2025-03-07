@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+   <!-- ✅ Correct -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+</head>
+<body class="bg-gray-100">
+
+    <div class="navbar bg-blue-500 text-white text-center p-5 shadow-lg flex justify-between items-center">
+        <div class="text-xl font-bold">Parent Dashboard</div>
+        <div class="student-info text-lg">Student: <span id="student-name">Loading...</span></div>
+    </div>
+    
+    <div class="container max-w-3xl mx-auto mt-8 p-4 bg-white rounded-lg shadow">
+        
+        <div class="dashboard-overview grid grid-cols-2 gap-4">
+            <div class="overview-card bg-gray-100 p-5 rounded-lg text-center">
+                <h2 class="text-blue-600 font-bold">Attendance Rate</h2>
+                <div class="text-3xl font-bold text-gray-800" id="attendance">--%</div>
+            </div>
+            <div class="overview-card bg-gray-100 p-5 rounded-lg text-center">
+                <h2 class="text-blue-600 font-bold">Marks</h2>
+                <div class="text-3xl font-bold text-gray-800" id="marks">--</div>
+            </div>
+        </div>
+
+        <!-- Risk Status -->
+        <div class="risk-status-box bg-gray-100 p-5 rounded-lg text-center mt-6">
+            <div class="text-xl font-bold text-gray-700">Academic Risk Status</div>
+            <div id="risk-indicator" class="text-white px-4 py-2 rounded-lg text-lg mt-3">Loading...</div>
+            <p id="risk-description" class="text-gray-600 mt-2"></p>
+        </div>
+        
+    </div>
+
+    <script>
+        // Firebase configuration (Replace with your own credentials)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCutyrVdAXgzDoGglHGD-j55AVzFjHR5eo",
+        authDomain: "allcleartech-11c44.firebaseapp.com",
+        projectId: "allcleartech-11c44",
+        storageBucket: "allcleartech-11c44.firebasestorage.app",
+        messagingSenderId: "746758569433",
+        appId: "1:746758569433:web:64a5db5c3123a758422dc8"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Function to fetch student data
+        function fetchStudentData(studentId) {
+            console.log(studentId)
+            db.collection("students").doc(studentId).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    
+                    document.getElementById('student-name').textContent = data.name || "Unknown";
+                    document.getElementById('attendance').textContent = data.attendance + "%" || "--%";
+                    document.getElementById('marks').textContent = data.marks || "--";
+
+                    // Define risk thresholds
+                    const attendanceThreshold = 75;
+                    const marksThreshold = 35;
+
+                    // Determine risk status
+                    const isAtRisk = data.attendance < attendanceThreshold || data.marks < marksThreshold;
+
+                    const riskIndicator = document.getElementById('risk-indicator');
+                    const riskDescription = document.getElementById('risk-description');
+
+                    if (isAtRisk) {
+                        riskIndicator.textContent = "At Risk";
+                        riskIndicator.className = "bg-red-500 text-white px-4 py-2 rounded-lg";
+                        riskDescription.textContent = "This student is at risk. Immediate intervention is recommended.";
+                    } else {
+                        riskIndicator.textContent = "Not at Risk";
+                        riskIndicator.className = "bg-green-500 text-white px-4 py-2 rounded-lg";
+                        riskDescription.textContent = "This student is performing well.";
+                    }
+                } else {
+                    console.error("No such student found!");
+                }
+            }).catch((error) => {
+                console.error("Error fetching student data: ", error);
+            });
+        }
+
+        // Replace with actual student ID from Firestore
+        fetchStudentData("29SiNVqBqDvetrsPxZim");
+    </script>
+
+</body>
+</html>

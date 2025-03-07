@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Creator & Publisher</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #007bff;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            height: 50px;
+            line-height: 50px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        .input-group {
+            margin: 10px 0;
+            text-align: left;
+        }
+        input[type="text"], input[type="number"] {
+            width: 95%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .button-group {
+            margin-top: 15px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 18px;
+            margin: 5px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .question-container, .added-questions {
+            text-align: left;
+            margin-top: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        #result {
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+            margin-top: 20px;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCutyrVdAXgzDoGglHGD-j55AVzFjHR5eo",
+            authDomain: "allcleartech-11c44.firebaseapp.com",
+            projectId: "allcleartech-11c44",
+            storageBucket: "allcleartech-11c44.firebasestorage.app",
+            messagingSenderId: "746758569433",
+            appId: "1:746758569433:web:64a5db5c3123a758422dc8"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(app);
+
+        let questions = [];
+        let temporaryQuestions = [];
+
+        function addQuestion() {
+            const subjectName = document.getElementById("subject-name").value;
+            const questionText = document.getElementById("question-text").value;
+            const option1 = document.getElementById("option1").value;
+            const option2 = document.getElementById("option2").value;
+            const option3 = document.getElementById("option3").value;
+            const option4 = document.getElementById("option4").value;
+            const correctAnswer = document.getElementById("correct-answer").value;
+            
+            if (!subjectName || !questionText || !option1 || !option2 || !option3 || !option4 || !correctAnswer) {
+                alert("Please fill all fields");
+                return;
+            }
+
+            // Create a new question object
+            const newQuestion = {
+                subject: subjectName,
+                question: questionText,
+                options: [option1, option2, option3, option4],
+                correct: parseInt(correctAnswer)
+            };
+
+            // Temporarily store the question in memory
+            temporaryQuestions.push(newQuestion);
+
+            // Display the added questions for review
+            displayAddedQuestions();
+
+            // Clear input fields
+            clearInputFields();
+
+            // Once two questions are added, store the first one and clear the list
+            if (temporaryQuestions.length === 2) {
+                // Store the first question in Firebase
+                storeQuestionInFirestore(temporaryQuestions[0]);
+
+                // Clear the temporary question list and leave the second question for review
+                temporaryQuestions = [temporaryQuestions[1]];
+            }
+        }
+
+        function storeQuestionInFirestore(question) {
+            db.collection("quizzes").add(question)
+                .then((docRef) => {
+                    console.log("Document written with ID: ", docRef.id);
+                    alert("Question added to the database");
+                })
+                .catch((error) => {
+                    console.error("Error adding document: ", error);
+                    alert("Error adding question");
+                });
+        }
+
+        function displayAddedQuestions() {
+            let addedQuestionsDiv = document.getElementById("added-questions");
+            addedQuestionsDiv.innerHTML = "";
+
+            temporaryQuestions.forEach((q, index) => {
+                let questionHtml = `<div class='added-questions'>
+                    <p><strong>Subject: ${q.subject}</strong></p>
+                    <p><strong>Q${index + 1}: ${q.question}</strong></p>
+                    <p>Option 1: ${q.options[0]}</p>
+                    <p>Option 2: ${q.options[1]}</p>
+                    <p>Option 3: ${q.options[2]}</p>
+                    <p>Option 4: ${q.options[3]}</p>
+                </div>`;
+                addedQuestionsDiv.innerHTML += questionHtml;
+            });
+        }
+
+        function publishQuiz() {
+            let quizContainer = document.getElementById("quiz-container");
+            quizContainer.innerHTML = "";
+
+            db.collection("quizzes").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc, index) => {
+                    let q = doc.data();
+                    let questionHtml = `<div class='question-container'>
+                        <p><strong>Subject: ${q.subject}</strong></p>
+                        <p><strong>Q${index + 1}: ${q.question}</strong></p>
+                        <label><input type='radio' name='q${index}' value='1'> ${q.options[0]}</label><br>
+                        <label><input type='radio' name='q${index}' value='2'> ${q.options[1]}</label><br>
+                        <label><input type='radio' name='q${index}' value='3'> ${q.options[2]}</label><br>
+                        <label><input type='radio' name='q${index}' value='4'> ${q.options[3]}</label>
+                    </div>`;
+                    quizContainer.innerHTML += questionHtml;
+                });
+            });
+
+            document.getElementById("published-quiz").classList.remove("hidden");
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            db.collection("quizzes").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc, index) => {
+                    let q = doc.data();
+                    let selected = document.querySelector(input[name='q${index}']:checked);
+                    if (selected && parseInt(selected.value) === q.correct) {
+                        score++;
+                    }
+                });
+
+                document.getElementById("result").innerText = You scored ${score} out of ${querySnapshot.size};
+            });
+        }
+
+        function clearInputFields() {
+            document.getElementById("subject-name").value = "";
+            document.getElementById("question-text").value = "";
+            document.getElementById("option1").value = "";
+            document.getElementById("option2").value = "";
+            document.getElementById("option3").value = "";
+            document.getElementById("option4").value = "";
+            document.getElementById("correct-answer").value = "";
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar">Quiz Creator</div>
+    <div class="container">
+        <h1>Create Your Quiz</h1>
+        <h2>ALL CLEAR TECH</h2>
+        <div class="input-group">
+            <input type="text" id="subject-name" placeholder="Enter Subject Name">
+        </div>
+        <div id="quiz-setup">
+            <div class="input-group">
+                <input type="text" id="question-text" placeholder="Enter question">
+            </div>
+            <div class="input-group">
+                <input type="text" id="option1" placeholder="Option 1">
+                <input type="text" id="option2" placeholder="Option 2">
+            </div>
+            <div class="input-group">
+                <input type="text" id="option3" placeholder="Option 3">
+                <input type="text" id="option4" placeholder="Option 4">
+            </div>
+            <div class="input-group">
+                <input type="number" id="correct-answer" placeholder="Correct Option (1-4)" min="1" max="4">
+            </div>
+            <div class="button-group">
+                <button onclick="addQuestion()">Add Question</button>
+                <button onclick="publishQuiz()">Publish Quiz</button>
+            </div>
+        </div>
+        <div id="added-questions"></div>
+        <div id="quiz-container"></div>
+        <div id="published-quiz" class="hidden">
+            <button onclick="submitQuiz()">Submit Quiz</button>
+            <h3 id="result"></h3>
+        </div>
+    </div>
+</body>
+</html>

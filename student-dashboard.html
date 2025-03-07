@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" >
+    <title>Engineering Student Dashboard</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            text-align: center;
+        }
+        
+        nav {
+            background-color: #34495e;
+            padding: 10px 0;
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin: 0 15px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        nav ul li a:hover {
+            color: #3498db;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-header h3 {
+            color: #2c3e50;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .subject-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .subject-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .strength {
+            border-left-color: #2ecc71;
+        }
+        
+        .weakness {
+            border-left-color: #e74c3c;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #f1f1f1;
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #3498db;
+        }
+        
+        .strength .progress-bar {
+            background-color: #2ecc71;
+        }
+        
+        .weakness .progress-bar {
+            background-color: #e74c3c;
+        }
+        
+        .quote {
+            font-style: italic;
+            color: #7f8c8d;
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        /* Quiz Styles */
+        .quiz-container {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .quiz-options {
+            list-style: none;
+        }
+        
+        .quiz-options li {
+            margin: 10px 0;
+        }
+        
+        .quiz-options label {
+            display: block;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .quiz-options label:hover {
+            background-color: #e1e1e1;
+        }
+        
+        .quiz-options input[type="radio"] {
+            margin-right: 10px;
+        }
+        
+        .quiz-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        /* Results Styles */
+        .results-container {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .results-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .results-summary {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .results-details {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .result-item.correct {
+            border-left: 4px solid #2ecc71;
+        }
+        
+        .result-item.incorrect {
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .recommendation {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #edf7fd;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        
+        /* Resources Modal */
+        .resources-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .resources-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 800px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+        
+        .resource-item {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .resource-item h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .resource-item a {
+            color: #3498db;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .resource-item a:hover {
+            text-decoration: underline;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px 0;
+            background-color: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Engineering Student Dashboard</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#tests">Tests</a></li>
+                <li><a href="#performance">Performance</a></li>
+                <li><a href="#" id="resources-btn">Resources</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container" id="dashboard">
+        <h2>Dashboard Overview</h2>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Subject Performance</h3>
+                </div>
+                <div class="subject-list">
+                    <div class="subject-card strength">
+                        <div>
+                            <h4>Applied Mathematics</h4>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 85%"></div>
+                            </div>
+                            <small>85% Proficiency</small>
+                        </div>
+                    </div>
+                    <div class="subject-card strength">
+                        <div>
+                            <h4>Engineering Physics</h4>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 78%"></div>
+                            </div>
+                            <small>78% Proficiency</small>
+                        </div>
+                    </div>
+                    <div class="subject-card">
+                        <div>
+                            <h4>Engineering Chemistry</h4>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 65%"></div>
+                            </div>
+                            <small>65% Proficiency</small>
+                        </div>
+                    </div>
+                    <div class="subject-card weakness">
+                        <div>
+                            <h4>Engineering Mechanics</h4>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 45%"></div>
+                            </div>
+                            <small>45% Proficiency</small>
+                        </div>
+                    </div>
+                    <div class="subject-card weakness">
+                        <div>
+                            <h4>Basic Electrical Engineering</h4>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 52%"></div>
+                            </div>
+                            <small>52% Proficiency</small>
+                        </div>
+                    </div>
+                    <div class="subject-card">
+                        <div>
+                            <h4>Engineering Drawing</h4>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 70%"></div>
+                            </div>
+                            <small>70% Proficiency</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>Upcoming Tests</h3>
+                </div>
+                <ul style="list-style: none;">
+                    <li style="padding: 10px; border-bottom: 1px solid #eee;">
+                        <h4>Applied Mathematics</h4>
+                        <p>Topic: Differential Equations</p>
+                        <a href="#" class="btn" onclick="startQuiz('mathematics')">Start Test</a>
+                    </li>
+                    <li style="padding: 10px; border-bottom: 1px solid #eee;">
+                        <h4>Engineering Mechanics</h4>
+                        <p>Topic: Laws of Motion</p>
+                        <a href="#" class="btn" onclick="startQuiz('mechanics')">Start Test</a>
+                    </li>
+                    <li style="padding: 10px; border-bottom: 1px solid #eee;">
+                        <h4>Engineering Graphics</h4>
+                        <p>Topic:Projection of Solids </p>
+                        <a href="#" class="btn" onclick="startQuiz('graphics')">Start Test</a>
+                    </li>
+                    <li style="padding: 10px;">
+                        <h4>Basic Electrical Engineering</h4>
+                        <p>Topic: Circuit Analysis</p>
+                        <a href="#" class="btn" onclick="startQuiz('electrical')">Start Test</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3>Motivational Quotes</h3>
+            </div>
+            <div class="quote">
+                <p>"Mathematics is not about numbers, equations, computations, or algorithms: it is about understanding." - William Paul Thurston</p>
+            </div>
+            <div class="quote">
+                <p>"Design is not just what it looks like and feels like. Design is how it works." - Steve Jobs</p>
+            </div>
+            <div class="quote">
+                <p>"Engineering graphics is the language of engineers, turning imagination into reality through precision and clarity." - Henry Petroski </p>
+            </div>
+            <div class="quote">
+                <p>"The scientist is not a person who gives the right answers, he's one who asks the right questions." - Claude Lévi-Strauss</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="quiz-container" id="quiz">
+        <div class="quiz-header">
+            <h2 id="quiz-subject">Applied Mathematics Quiz</h2>
+            <p id="quiz-topic">Topic: Differential Equations</p>
+        </div>
+        
+        <div class="quiz-question" id="question-container">
+            <h3 id="question-text">Question 1: What is a first-order differential equation?</h3>
+            <ul class="quiz-options" id="options-container">
+                <li>
+                    <label>
+                        <input type="radio" name="q1" value="a"> An equation containing only the first derivative of the dependent variable
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="radio" name="q1" value="b"> An equation containing the second derivative of the dependent variable
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="radio" name="q1" value="c"> An equation containing no derivatives
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="radio" name="q1" value="d"> An equation containing both first and second derivatives
+                    </label>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="quiz-navigation">
+            <button class="btn" id="prev-btn" onclick="showPreviousQuestion()" disabled>Previous</button>
+            <span id="question-counter">Question 1 of 5</span>
+            <button class="btn" id="next-btn" onclick="showNextQuestion()">Next</button>
+            <button class="btn btn-success" id="submit-btn" style="display: none;" onclick="submitQuiz()">Submit Quiz</button>
+        </div>
+    </div>
+
+    <div class="results-container" id="results">
+        <div class="results-header">
+            <h2>Test Results</h2>
+        </div>
+        
+        <div class="results-summary">
+            <h3>You scored <span id="score">4</span> out of 5</h3>
+            <p>Subject: <span id="result-subject">Applied Mathematics</span></p>
+            <p>Performance: <span id="performance-label">Excellent!</span></p>
+        </div>
+        
+        <div class="recommendation">
+            <h3>Recommendations</h3>
+            <p id="recommendation-text">Based on your performance, you have a good grasp of differential equations. We recommend reviewing the properties of linear differential equations to further enhance your understanding.</p>
+        </div>
+        
+        <div class="results-details">
+            <h3>Question Details</h3>
+            <div class="result-item correct">
+                <p><strong>Question 1:</strong> What is a first-order differential equation?</p>
+                <p><strong>Your Answer:</strong> An equation containing only the first derivative of the dependent variable ✓</p>
+            </div>
+            <div class="result-item incorrect">
+                <p><strong>Question 2:</strong> Which method is used to solve a system of linear differential equations?</p>
+                <p><strong>Your Answer:</strong> Substitution method ✗</p>
+                <p><strong>Correct Answer:</strong> Eigenvalue method</p>
+            </div>
+            <div class="result-item correct">
+                <p><strong>Question 3:</strong> What is an integrating factor?</p>
+                <p><strong>Your Answer:</strong> A function that when multiplied with a differential equation makes it exact ✓</p>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn" onclick="returnToDashboard()">Return to Dashboard</button>
+            <button class="btn btn-success" onclick="viewResources()">View Resources</button>
+        </div>
+    </div>
+
+    <div class="resources-modal" id="resources-modal">
+        <div class="resources-content">
+            <span class="close" onclick="closeResources()">&times;</span>
+            <h2>Learning Resources</h2>
+            
+            <div class="resource-item">
+                <h4>Applied Mathematics</h4>
+                <p>"The only way to learn mathematics is to do mathematics." - Paul Halmos.</p>
+                <a href="https://youtu.be/us4aBeAtLnI?si=F9XJmQiq_O92-kgh" target="_blank">How to pass at last moment</a><br>
+                <a href="https://youtube.com/playlist?list=PLFUu8OMFkQIo1UVVqvKqgGbVBtvGN2ITR&si=9nblTj1ICtBWAFgg" target="_blank">Engineering Mathematics 1</a><br>
+                <a href="https://youtube.com/playlist?list=PLT3bOBUU3L9i7FpJmAHZijmD7i7Chsnv8&si=GZISLJYDFBDfy4Q4" target="_blank">Engineering Mathematics 2</a>
+            </div>
+
+            <div class="resource-item">
+                <h4>C Programming</h4>
+                <p>"Programming isn't about what you know; it's about what you can figure out." - Chris Pine</p>
+                <a href="https://youtube.com/playlist?list=PLdo5W4Nhv31a8UcMN9-35ghv8qyFWD9_S&feature=shared" target="_blank">Complete C Programming</a><br>
+            </div>
+            
+            <div class="resource-item">
+                <h4>Engineering Physics</h4>
+                <p>"Physics is not about how the world is, it is about what we can say about the world." - Niels Bohr.</p>
+                <a href="https://youtu.be/2_Q6y-tgzOk?si=Yqko54yibqMjwu8D" target="_blank">How to pass Engineering Physics 1</a><br>
+                <a href="https://youtu.be/U99vssMxGK8?si=xyKdtWS5JsKNfI5b" target="_blank">How to pass Engineering Physics 2</a><br>
+            </div>
+            
+            <div class="resource-item">
+                <h4>Engineering Chemistry</h4>
+                <p>"Chemistry is the bridge between physics and life." - Unknown</p>
+                <a href="https://youtu.be/F-IxGgO-RLo?si=DrH4HFPMAh4GQx85" target="_blank">Most Important Question Engineering Chemistry 1</a><br>
+                <a href="https://youtu.be/OgL--PGy1Ww?si=VgCxf-x6HLrceOQe" target="_blank">Most Important Question Engineering Chemistry 2</a>
+            </div>
+            
+            <div class="resource-item">
+                <h4>Engineering Mechanics</h4>
+                <p>"Mechanics is the playground of mathematical physics." - Arthur Eddington</p>
+                <a href="https://youtu.be/1tpjUCqDTSQ?si=FL8OXa3QMrd-vKJx" target="_blank">How to pass Engineering Mechanics</a><br>
+                <a href="https://youtu.be/rUq2k_UxF3A?si=WKxIhO-jMz2bzuTc" target="_blank">All Units - One Shot</a>
+            </div>
+            
+            <div class="resource-item">
+                <h4>Basic Electrical Engineering</h4>
+                <p>"Power is nothing without control, and control is everything in electrical engineering." - Unknown</p>
+                <a href="https://youtube.com/playlist?list=PLKS7ZMKnbPrQZZoeQJGYojStGLstMnffL&feature=shared" target="_blank">DC Circuit</a><br>
+                <a href="https://youtube.com/playlist?list=PLKS7ZMKnbPrQZP4zxS47bzkf8sGYlaIKM&feature=shared" target="_blank">AC Circuit</a>
+            </div>
+            
+            <div class="resource-item">
+                <h4>Engineering Graphics</h4>
+                <p>"Engineering graphics is the language of engineers—where ideas take shape before reality." - Unknown</p>
+                <a href="https://youtube.com/playlist?list=PLDN15nk5uLiD3MEUiqsYPnZOHcVu7um6_&feature=shared" target="_blank">Engineering Graphics - Series</a><br>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Engineering Student Dashboard. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Floating AI Button -->
+<div        href="test.html" class="floating-ai-button" id="ai-assistant-button" >
+    <div class="ai-icon">
+      <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+        <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/>
+        <path fill="currentColor" d="M12 7l-5 5h10l-5-5z"/>
+      </svg>
+    </div>
+    <span class="ai-tooltip">AI Assistant</span>
+  </div>
+  
+  <!-- CSS for the floating button -->
+  <style>
+    .floating-ai-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6e8efb, #a777e3);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 9999;
+      transition: all 0.3s ease;
+    }
+  
+    .floating-ai-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+  
+    .ai-icon {
+      color: white;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .ai-tooltip {
+      position: absolute;
+      background-color: #333;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      bottom: 70px;
+      right: 0;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+  
+    .floating-ai-button:hover .ai-tooltip {
+      opacity: 1;
+    }
+  
+    /* Animation for the button */
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(110, 142, 251, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(110, 142, 251, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(110, 142, 251, 0); }
+    }
+  
+    /* Add subtle pulse animation on page load */
+    .floating-ai-button {
+      animation: pulse 2s infinite;
+    }
+  </style>
+  
+  <!-- JavaScript for button functionality -->
+  <script>
+    document.getElementById('ai-assistant-button').addEventListener('click', function() {
+      window.location.href="test.html";
+        
+    
+      
+      // Alternatively, you could open a chat modal:
+      // document.getElementById('ai-chat-modal').style.display = 'block';
+    });
+  </script>
+    <script>
+        let userPerformance = {
+        mathematics: 0,
+        mechanics: 0,
+        graphics: 0,
+        electrical: 0
+    };
+        // Variables to track quiz state
+        let currentQuestion = 1;
+        let currentSubject = '';
+        const totalQuestions = 5;
+       
+        
+        // Quiz data for different subjects
+        const quizData = {
+            mathematics: {
+                title: "Applied Mathematics Quiz",
+                topic: "Topic: Differential Equations",
+                questions: [
+                    {
+                        text: "What is a first-order differential equation?",
+                        options: [
+                            "An equation containing only the first derivative of the dependent variable",
+                            "An equation containing the second derivative of the dependent variable",
+                            "An equation containing no derivatives",
+                            "An equation containing both first and second derivatives"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        text: "Which method is used to solve a system of linear differential equations?",
+                        options: [
+                            "Substitution method",
+                            "Eigenvalue method",
+                            "Simpson's rule",
+                            "Newton-Raphson method"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        text: "What is an integrating factor?",
+                        options: [
+                            "A constant that simplifies differentiation",
+                            "A variable that makes integration easier",
+                            "A function that when multiplied with a differential equation makes it exact",
+                            "A technique for solving partial differential equations"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        text: "The solution of a homogeneous linear differential equation with constant coefficients is:",
+                        options: [
+                            "Always a polynomial",
+                            "Always an exponential function",
+                            "Can be exponential, sine, cosine, or a combination",
+                            "Always a logarithmic function"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        text: "What is the order of the differential equation d²y/dx² + 3(dy/dx) + 2y = 0?",
+                        options: [
+                            "Zero",
+                            "First",
+                            "Second",
+                            "Third"
+                        ],
+                        correctAnswer: 2
+                    }
+                ],
+                quote: "Mathematics is the music of reason. - James Joseph Sylvester"
+            },
+            mechanics: {
+                title: "Engineering Mechanics Quiz",
+                topic: "Topic: Laws of Motion",
+                questions: [
+                    {
+                        text: "What is the SI unit of force?",
+                        options: ["Newton", "Joule", "Watt", "Pascal"],
+                        correctAnswer: 0
+                    },
+                    {
+                        text: "Which law states that 'A body remains at rest or in uniform motion unless acted upon by an external force'?",
+                        options: ["Newton's First Law", "Newton's Second Law", "Newton's Third Law", "Law of Gravitation"],
+                        correctAnswer: 0
+                    },
+                    {
+                        text: "What type of force is responsible for circular motion?",
+                        options: ["Centrifugal force", "Centripetal force", "Frictional force", "Gravitational force"],
+                        correctAnswer: 1
+                    },
+                    {
+                        text: "What is the moment of a force?",
+                        options: ["Force × Time", "Force × Distance", "Mass × Acceleration", "Velocity × Time"],
+                        correctAnswer: 1
+                    },
+                    {
+                        text: "Which of the following is an example of a scalar quantity?",
+                        options: ["Velocity", "Acceleration", "Force", "Mass"],
+                        correctAnswer: 3
+                    }
+                ],
+                quote: "Engineering Mechanics is not just about forces and motion; it's about mastering the balance between knowledge and creativity to build the future. - Erwin Schrödinger"
+            },
+            graphics: {
+                title: "Engineering Graphics Quiz",
+                topic: " Projection of Solids ",
+                questions: [
+                    {
+                        text: "Which method is commonly used for representing three-dimensional objects on a two-dimensional plane?",
+            options: [
+                "Perspective Projection",
+                "Orthographic Projection",
+                "Isometric Projection",
+                "Oblique Projection"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        text: "What is the purpose of sectional views in engineering drawings?",
+            options: [
+                "To show the object's external appearance",
+                "To reduce the number of views required",
+                "To reveal internal features of an object",
+                "To make the drawing more decorative"
+            ],
+            correctAnswer: 2
+                    },
+                    {
+                        text: "In an isometric projection, the angle between the axes is:",
+            options: [
+                "30°",
+                "45°",
+                "60°",
+                "90°"
+            ],
+            correctAnswer: 0
+                    },
+                    {
+                        text: "Which type of line is used to represent hidden features in an engineering drawing?",
+            options: [
+                "Continuous thick line",
+                "Dashed line",
+                "Center line",
+                "Chain line"
+            ],
+            correctAnswer: 1
+                    },
+                    {
+                        text: "Which of the following views is NOT a principal view in orthographic projection?",
+            options: [
+                "Top view",
+                "Front view",
+                "Side view",
+                "Isometric view"
+            ],
+            correctAnswer: 3
+                    }
+                ],
+                quote: "Engineering graphics is the language of engineers, turning imagination into reality through precision and clarity. –Henry Petroski "
+            },
+            electrical: {
+                title: "Basic Electrical Engineering Quiz",
+                topic: "Topic: Circuit Analysis",
+                questions: [
+                    {
+                        text: "What is Kirchhoff's Current Law?",
+                        options: [
+                            "The sum of voltages around any closed loop is zero",
+                            "The sum of currents entering a node equals the sum of currents leaving the node",
+                            "The current through a resistor is proportional to the voltage across it",
+                            "The power consumed equals the product of voltage and current"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        text: "What is the impedance of a pure capacitor?",
+                        options: [
+                            "Z = R",
+                            "Z = jωL",
+                            "Z = 1/jωC",
+                            "Z = R + jωL"
+                        ],
+                        correctAnswer: 2
+                    },
+                    {
+                        text: "In an RLC circuit at resonance, what is true?",
+                        options: [
+                            "The current is in phase with the voltage",
+                            "The impedance is purely resistive",
+                            "The capacitive reactance is zero",
+                            "The circuit is purely inductive"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        text: "What does the Thevenin equivalent circuit consist of?",
+                        options: [
+                            "A current source in parallel with a resistor",
+                            "A voltage source in series with a resistor",
+                            "Two voltage sources in parallel",
+                            "Two resistors in series"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        text: "What is the power factor of a circuit?",
+                        options: [
+                            "The ratio of resistance to impedance",
+                            "The ratio of reactive power to real power",
+                            "The cosine of the phase angle between voltage and current",
+                            "The product of voltage and current"
+                        ],
+                        correctAnswer: 2
+                    }
+                ],
+                quote: "Electricity is really just organized lightning. - George Carlin"
+            }
+        };
+        // Function to start a quiz for a specific subject
+        function startQuiz(subject) {
+        currentSubject = subject;
+        currentQuestion = 1;
+
+        document.getElementById('quiz-subject').textContent = quizData[subject].title;
+        document.getElementById('quiz-topic').textContent = quizData[subject].topic;
+
+        displayQuestion(1);
+
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('quiz').style.display = 'block';
+        document.getElementById('results').style.display = 'none';
+
+        document.getElementById('prev-btn').disabled = true;
+        document.getElementById('next-btn').style.display = 'inline-block';
+        document.getElementById('submit-btn').style.display = 'none';
+    }
+
+
+// Function to display a specific question
+function displayQuestion(questionNumber) {
+        const question = quizData[currentSubject].questions[questionNumber - 1];
+
+        document.getElementById('question-text').textContent = `Question ${questionNumber}: ${question.text}`;
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        question.options.forEach((option, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <label>
+                    <input type="radio" name="q${questionNumber}" value="${index}"> ${option}
+                </label>
+            `;
+            optionsContainer.appendChild(li);
+        });
+
+        document.getElementById('question-counter').textContent = `Question ${questionNumber} of ${totalQuestions}`;
+    }
+
+// Function to show next question
+function showNextQuestion() {
+        if (currentQuestion < totalQuestions) {
+            currentQuestion++;
+            displayQuestion(currentQuestion);
+
+            document.getElementById('prev-btn').disabled = false;
+
+            if (currentQuestion === totalQuestions) {
+                document.getElementById('next-btn').style.display = 'none';
+                document.getElementById('submit-btn').style.display = 'inline-block';
+            }
+        }
+    }
+
+// Function to show previous question
+function showPreviousQuestion() {
+        if (currentQuestion > 1) {
+            currentQuestion--;
+            displayQuestion(currentQuestion);
+
+            document.getElementById('next-btn').style.display = 'inline-block';
+            document.getElementById('submit-btn').style.display = 'none';
+
+            if (currentQuestion === 1) {
+                document.getElementById('prev-btn').disabled = true;
+            }
+        }
+    }
+// Function to submit quiz and display results
+function submitQuiz() {
+        let score = 0;
+        const questions = quizData[currentSubject].questions;
+
+        questions.forEach((question, index) => {
+            const selectedOption = document.querySelector(`input[name="q${index + 1}"]:checked`);
+            if (selectedOption && parseInt(selectedOption.value) === question.correctAnswer) {
+                score++;
+            }
+        });
+// Function to return to dashboard
+function returnToDashboard() {
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+}
+
+// Function to open resources modal
+function viewResources() {
+    document.getElementById('resources-modal').style.display = 'block';
+}
+
+// Function to handle resources button
+document.getElementById('resources-btn').addEventListener('click', function() {
+    document.getElementById('resources-modal').style.display = 'block';
+});
+
+// Function to close resources modal
+function closeResources() {
+    document.getElementById('resources-modal').style.display = 'none';
+}
+let proficiency = (score / totalQuestions) * 100;
+        userPerformance[currentSubject] = proficiency;
+
+        document.getElementById('quiz').style.display = 'none';
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('result-subject').textContent = quizData[currentSubject].title.replace(' Quiz', '');
+        document.getElementById('result-score').textContent = `Score: ${score} / ${totalQuestions}`;
+        document.getElementById('result-proficiency').textContent = `Proficiency: ${proficiency.toFixed(2)}%`;
+    }
+
+    function returnToDashboard() {
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+    }
+
+    function showPerformance() {
+        let performanceContainer = document.getElementById('performance-container');
+        performanceContainer.innerHTML = '';
+
+        for (let subject in userPerformance) {
+            let proficiency = userPerformance[subject];
+            let subjectTitle = quizData[subject].title.replace(' Quiz', '');
+
+            let subjectDiv = document.createElement('div');
+            subjectDiv.classList.add('performance-item');
+            subjectDiv.innerHTML = `
+                <h3>${subjectTitle}</h3>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: ${proficiency}%;"></div>
+                </div>
+                <p>Proficiency: ${proficiency.toFixed(2)}%</p>
+            `;
+            performanceContainer.appendChild(subjectDiv);
+        }
+
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('performance').style.display = 'block';
+    }
+</script>
+
+<style>
+    .progress-bar-container {
+        width: 100%;
+        height: 20px;
+        background: #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        transition: width 0.5s ease-in-out;
+    }
+</style>
+</script>
